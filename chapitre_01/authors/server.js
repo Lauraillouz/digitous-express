@@ -19,7 +19,7 @@ app.get("/authors/:authorId/", (req, res) => {
 app.get("/authors/:authorId/books/", (req, res) => {
     let authorId = req.params.authorId;
     let author = authors[authorId -1];
-    res.send(`${author.books}`);
+    res.send(`${author.books.join(", ")}`);
 });
 
 
