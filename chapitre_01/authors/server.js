@@ -3,10 +3,14 @@ const app = express();
 
 var authors = require("./authors.js");
 
+
+
 // Exercie 1 - Route homepage
 app.get("/", (req, res) => {
     res.send("Authors API");
 });
+
+
 
 // Exercice 2 - Routes auteurs
 app.get("/authors/:authorId/", (req, res) => {
@@ -15,6 +19,8 @@ app.get("/authors/:authorId/", (req, res) => {
     res.send(`${author.name}, ${author.nationality}`);
 });
 
+
+
 // Exercice 3 - Routes livres
 app.get("/authors/:authorId/books/", (req, res) => {
     let authorId = req.params.authorId;
@@ -22,6 +28,25 @@ app.get("/authors/:authorId/books/", (req, res) => {
     res.send(`${author.books.join(", ")}`);
 });
 
+
+
+// Exercice 4 - Routes json
+app.get("/json/authors/:id", (req, res) => {
+    let id = req.params.id;
+    let author = authors[id -1];
+    res.send(`{
+        name: "${author.name}",
+        nationality: "${author.nationality}"
+    }`);
+})
+
+app.get("/json/authors/:id/books", (req, res) => {
+    let id = req.params.id;
+    let author = authors[id -1];
+    res.send(`{
+        books: ["${author.books.join(", ")}"]
+    }`)
+})
 
 
 
