@@ -34,18 +34,18 @@ app.get("/authors/:authorId/books/", (req, res) => {
 app.get("/json/authors/:id", (req, res) => {
     let id = req.params.id;
     let author = authors[id -1];
-    res.send(`{
-        name: "${author.name}",
-        nationality: "${author.nationality}"
-    }`);
+    res.json({
+        name: author.name,
+        nationality: author.nationality
+    });
 })
 
 app.get("/json/authors/:id/books", (req, res) => {
     let id = req.params.id;
     let author = authors[id -1];
-    res.send(`{
-        books: ["${author.books.join(", ")}"]
-    }`)
+    res.json({
+        books: author.books
+    })
 })
 
 
