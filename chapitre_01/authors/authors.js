@@ -20,3 +20,5 @@ var authors = [
         books: ["The Picture of Dorian Gray", "The Importance of Being Earnest"]
     },
 ]
+
+module.exports = authors;
