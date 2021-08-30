@@ -1,11 +1,13 @@
 const express = require("express");
 const app = express();
+const cors = require("cors");
 // Port
-const PORT = 3000;
+const PORT = 3001;
 // Data Students
-const students = [{ name: "Laura" }];
+const students = [{ name: "Laura" }, { name: "Emran" }, { name: "Rahmad" }];
 
 app.use(express.json());
+app.use(cors());
 
 // Middleware global
 app.use((req, res, next) => {
