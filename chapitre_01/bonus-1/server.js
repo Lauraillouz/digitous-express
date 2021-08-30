@@ -16,5 +16,5 @@ app.get("/countries/", (req, res) => {
 
 // Écoute serveur
 app.listen(port, () => {
-    console.log("Listening on port 3001");
+    console.log(`Listening on port ${port}`);
 });

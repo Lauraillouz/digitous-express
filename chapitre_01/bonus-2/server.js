@@ -18,6 +18,7 @@ app.get("/pokemons/", (req, res) => {
 // Route Pokemons id
 app.get("/pokemons/:id", (req, res) => {
     let pokemonId = req.params.id;
+    
 })
 
 
