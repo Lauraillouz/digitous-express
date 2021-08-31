@@ -9,7 +9,7 @@ app.use(express.json());
 app.use(morgan("tiny"));
 app.use(cors());
 
-const superHeroes = [
+let superHeroes = [
   {
     name: "Iron Man",
     power: ["money"],
@@ -71,12 +71,13 @@ app.get("/heroes", (req, res) => {
     superHeroes,
   });
 });
-app.post("/heroes", transformName, (req, res) => {
+app.patch("/heroes", transformName, (req, res) => {
   const newHero = req.body;
-  console.log("new hero is", newHero);
+  superHeroes = superHeroes.push(newHero);
+  console.log(superHeroes);
+  console.log(newHero);
   res.json({
     message: "Ok, héros ajouté",
-    newHero,
   });
 });
 
