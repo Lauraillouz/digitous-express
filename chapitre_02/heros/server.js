@@ -54,33 +54,46 @@ const transformName = (req, res, next) => {
   next();
 };
 
+const checkHero = (req, res, next) => {
+  const newHero = req.body;
+  superHeroes.map((hero) => {
+    if (hero.name.toLowerCase().replace(/\s+/g, "") === newHero.name) {
+      res.json({
+        message: "Ce héros existe déjà !",
+      });
+    }
+  });
+};
+
 // Middleware global
 app.use((req, res, next) => {
   next();
 });
 
-// Routes
+// ROUTES
+//Global
 app.get("/", debug, (req, res) => {
   res.json({
     message: "OK",
   });
 });
 
+// All heroes
 app.get("/heroes", (req, res) => {
   res.json({
     superHeroes,
   });
 });
-app.patch("/heroes", transformName, (req, res) => {
+// Add Hero
+app.patch("/heroes", transformName, checkHero, (req, res) => {
   const newHero = req.body;
   superHeroes = superHeroes.push(newHero);
-  console.log(superHeroes);
-  console.log(newHero);
   res.json({
     message: "Ok, héros ajouté",
   });
 });
 
+// Hero by name
 app.get("/heroes/:name", (req, res) => {
   let heroName = req.params;
   let hero = superHeroes.filter(
@@ -91,7 +104,7 @@ app.get("/heroes/:name", (req, res) => {
     hero,
   });
 });
-
+// Hero's power
 app.get("/heroes/:name/power", (req, res) => {
   let heroName = req.params;
   let hero = superHeroes.filter(
@@ -102,6 +115,7 @@ app.get("/heroes/:name/power", (req, res) => {
     power: hero[0].power,
   });
 });
+// Add new power
 app.patch("/heroes/:name/power", (req, res) => {
   let heroName = req.params;
   let hero = superHeroes.filter(
