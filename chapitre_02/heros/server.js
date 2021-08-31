@@ -21,7 +21,7 @@ let superHeroes = [
   },
   {
     name: "Thor",
-    power: ["electricty", "worthy"],
+    power: ["electricity", "worthy"],
     color: "blue",
     isAlive: true,
     age: 300,
@@ -137,7 +137,8 @@ app.delete("/heroes/:name", checkHeroRemove, (req, res) => {
 app.get("/heroes/:name/power", (req, res) => {
   let heroName = req.params;
   let hero = superHeroes.filter(
-    (hero) => hero.name.toLocaleLowerCase().replace(" ", "") === heroName.name
+    (hero) =>
+      hero.name.toLocaleLowerCase().replace(/\s+/g, "") === heroName.name
   );
   res.json({
     power: hero[0].power,
@@ -152,10 +153,24 @@ app.patch("/heroes/:name/power", (req, res) => {
   );
   let newPower = hero[0].power;
   newPower = newPower.push("blabla");
-  console.log(hero[0].power);
   res.json({
     message: "Pouvoir ajouté !",
   });
+});
+app.delete("/heroes/:name/power/:power", (req, res) => {
+  let heroName = req.params.name;
+  let powerToRemove = req.params.power;
+  let hero = superHeroes.filter((hero) => {
+    console.log(hero.power);
+    return hero.name.toLocaleLowerCase().replace(/\s+/g, "") === heroName;
+  });
+  let newPowers = hero[0].power.filter((power) => {
+    return power !== powerToRemove;
+  });
+  hero[0].power = newPowers;
+  console.log("new powers", newPowers);
+  console.log(hero[0].power);
+  console.log(superHeroes);
 });
 
 // Listening Port
