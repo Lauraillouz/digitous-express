@@ -61,23 +61,29 @@ const transformName = (req, res, next) => {
 const checkHeroAdd = (req, res, next) => {
   const newHero = req.body;
   superHeroes.map((hero) => {
-    if (hero.name.toLowerCase().replace(/\s+/g, "") === newHero.name) {
-      res.json({
+    if (hero.name.toLowerCase().replace(" ", "") === newHero.name) {
+      return res.json({
         message: "Ce héros existe déjà !",
       });
+    } else {
+      return next();
     }
   });
 };
 // Middleware to check if hero already exists before delete
 const checkHeroRemove = (req, res, next) => {
-  const heroToRemove = req.body;
-  superHeroes.map((hero) => {
-    if (hero.name.toLowerCase().replace(/\s+/g, "") !== heroToRemove.name) {
-      res.json({
+  const heroToRemove = req.params;
+  for (let i = 0; i < superHeroes.length; i++) {
+    if (
+      superHeroes[i].name.toLowerCase().replace(" ", "") === heroToRemove.name
+    ) {
+      return next();
+    } else {
+      return res.json({
         message: "Ce héros n'existe pas !",
       });
     }
-  });
+  }
 };
 
 // ROUTES
@@ -97,30 +103,33 @@ app.get("/heroes", (req, res) => {
 // Add Hero
 app.patch("/heroes", transformName, checkHeroAdd, (req, res) => {
   const newHero = req.body;
-  superHeroes = superHeroes.push(newHero);
+  superHeroes.push(newHero);
   res.json({
     message: "Ok, héros ajouté",
+    preuve: superHeroes,
   });
-});
-// Delete Hero
-app.delete("/heroes/:name", checkHeroRemove, (req, res) => {
-  let heroName = req.params;
-  let heroFiltered = superHeroes.filter((hero) => {
-    return hero.name.toLocaleLowerCase().replace(/\s+/g, "") !== heroName.name;
-  });
-  superHeroes = heroFiltered;
-  console.log(superHeroes);
 });
 
 // Hero by name
 app.get("/heroes/:name", (req, res) => {
   let heroName = req.params;
   let hero = superHeroes.filter(
-    (hero) =>
-      hero.name.toLocaleLowerCase().replace(/\s+/g, "") === heroName.name
+    (hero) => hero.name.toLocaleLowerCase().replace(" ", "") === heroName.name
   );
   res.json({
     hero,
+  });
+});
+// Delete Hero
+app.delete("/heroes/:name", checkHeroRemove, (req, res) => {
+  let heroName = req.params;
+  let heroesFiltered = superHeroes.filter((hero) => {
+    return hero.name.toLocaleLowerCase().replace(" ", "") !== heroName.name;
+  });
+  superHeroes = heroesFiltered;
+  res.json({
+    message: `${heroName.name} effacé correctement`,
+    preuve: superHeroes,
   });
 });
 
@@ -128,8 +137,7 @@ app.get("/heroes/:name", (req, res) => {
 app.get("/heroes/:name/power", (req, res) => {
   let heroName = req.params;
   let hero = superHeroes.filter(
-    (hero) =>
-      hero.name.toLocaleLowerCase().replace(/\s+/g, "") === heroName.name
+    (hero) => hero.name.toLocaleLowerCase().replace(" ", "") === heroName.name
   );
   res.json({
     power: hero[0].power,
