@@ -47,6 +47,11 @@ const debug = (req, res, next) => {
   }
 };
 
+const transformName = (req, res, next) => {
+  req.body.name = req.body.name.toLowerCase();
+  next();
+};
+
 // Middleware global
 app.use((req, res, next) => {
   next();
@@ -62,6 +67,14 @@ app.get("/", debug, (req, res) => {
 app.get("/heroes", (req, res) => {
   res.json({
     superHeroes,
+  });
+});
+app.post("/heroes", transformName, (req, res) => {
+  const newHero = req.body;
+  console.log("new hero is", newHero);
+  res.json({
+    message: "Ok, héros ajouté",
+    newHero,
   });
 });
 
