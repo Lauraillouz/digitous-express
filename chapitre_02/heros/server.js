@@ -76,6 +76,17 @@ app.get("/heroes/:name", (req, res) => {
   });
 });
 
+app.get("/heroes/:name/power", (req, res) => {
+  let heroName = req.params;
+  let hero = superHeroes.filter(
+    (hero) =>
+      hero.name.toLocaleLowerCase().replace(/\s+/g, "") === heroName.name
+  );
+  res.json({
+    power: hero[0].power,
+  });
+});
+
 // Listening Port
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);
