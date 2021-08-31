@@ -132,6 +132,24 @@ app.delete("/heroes/:name", checkHeroRemove, (req, res) => {
     preuve: superHeroes,
   });
 });
+// Replace Hero
+app.put("/heroes/:name", (req, res) => {
+  let heroName = req.params;
+  let newHero = req.body;
+  console.log(newHero);
+  let newSuperHeroes = superHeroes.map((hero) => {
+    if (hero.name.toLocaleLowerCase().replace(" ", "") === heroName.name) {
+      return (hero = newHero);
+    }
+    return hero;
+  });
+  superHeroes = newSuperHeroes;
+  console.log(newSuperHeroes);
+  res.json({
+    message: `${heroName} a bien été remplacé`,
+    preuve: superHeroes,
+  });
+});
 
 // Hero's power
 app.get("/heroes/:name/power", (req, res) => {
@@ -155,6 +173,7 @@ app.patch("/heroes/:name/power", (req, res) => {
   newPower = newPower.push("blabla");
   res.json({
     message: "Pouvoir ajouté !",
+    preuve: superHeroes,
   });
 });
 app.delete("/heroes/:name/power/:power", (req, res) => {
@@ -168,9 +187,10 @@ app.delete("/heroes/:name/power/:power", (req, res) => {
     return power !== powerToRemove;
   });
   hero[0].power = newPowers;
-  console.log("new powers", newPowers);
-  console.log(hero[0].power);
-  console.log(superHeroes);
+  res.json({
+    message: `Le pouvoir ${powerToRemove} de ${heroName} a bien été supprimé`,
+    preuve: superHeroes,
+  });
 });
 
 // Listening Port
