@@ -25,9 +25,10 @@ app.get("/students", (req, res) => {
 app.post("/students", (req, res) => {
   const newStudent = req.body;
   console.log(newStudent);
+  students.push(newStudent);
   res.json({
     message: "Student added",
-    newStudent,
+    preuve: students,
   });
 });
 
