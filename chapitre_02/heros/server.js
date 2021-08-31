@@ -48,13 +48,17 @@ const debug = (req, res, next) => {
     console.log("Server has not been sollicitated");
   }
 };
-
+// Middleware global
+app.use((req, res, next) => {
+  next();
+});
+// Middleware to Lowercase
 const transformName = (req, res, next) => {
   req.body.name = req.body.name.toLowerCase();
   next();
 };
-
-const checkHero = (req, res, next) => {
+// Middleware to check if hero already exists before add
+const checkHeroAdd = (req, res, next) => {
   const newHero = req.body;
   superHeroes.map((hero) => {
     if (hero.name.toLowerCase().replace(/\s+/g, "") === newHero.name) {
@@ -64,11 +68,17 @@ const checkHero = (req, res, next) => {
     }
   });
 };
-
-// Middleware global
-app.use((req, res, next) => {
-  next();
-});
+// Middleware to check if hero already exists before delete
+const checkHeroRemove = (req, res, next) => {
+  const heroToRemove = req.body;
+  superHeroes.map((hero) => {
+    if (hero.name.toLowerCase().replace(/\s+/g, "") !== heroToRemove.name) {
+      res.json({
+        message: "Ce héros n'existe pas !",
+      });
+    }
+  });
+};
 
 // ROUTES
 //Global
@@ -85,12 +95,21 @@ app.get("/heroes", (req, res) => {
   });
 });
 // Add Hero
-app.patch("/heroes", transformName, checkHero, (req, res) => {
+app.patch("/heroes", transformName, checkHeroAdd, (req, res) => {
   const newHero = req.body;
   superHeroes = superHeroes.push(newHero);
   res.json({
     message: "Ok, héros ajouté",
   });
+});
+// Delete Hero
+app.delete("/heroes/:name", checkHeroRemove, (req, res) => {
+  let heroName = req.params;
+  let heroFiltered = superHeroes.filter((hero) => {
+    return hero.name.toLocaleLowerCase().replace(/\s+/g, "") !== heroName.name;
+  });
+  superHeroes = heroFiltered;
+  console.log(superHeroes);
 });
 
 // Hero by name
@@ -104,6 +123,7 @@ app.get("/heroes/:name", (req, res) => {
     hero,
   });
 });
+
 // Hero's power
 app.get("/heroes/:name/power", (req, res) => {
   let heroName = req.params;
