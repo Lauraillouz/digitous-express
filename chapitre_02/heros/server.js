@@ -4,7 +4,7 @@ const app = express();
 // Port
 const PORT = 3002;
 
-const superHeros = [
+const superHeroes = [
   {
     name: "Iron Man",
     power: ["money"],
@@ -35,19 +35,7 @@ const superHeros = [
 ];
 
 app.use(express.json());
-app.use(
-  morgan(function (tokens, req, res) {
-    return [
-      tokens.method(req, res),
-      tokens.url(req, res),
-      tokens.status(req, res),
-      tokens.res(req, res, "content-length"),
-      "-",
-      tokens["response-time"](req, res),
-      "ms",
-    ].join(" ");
-  })
-);
+app.use(morgan("tiny"));
 
 const debug = (req, res, next) => {
   const auth = true;
@@ -68,6 +56,23 @@ app.use((req, res, next) => {
 app.get("/", debug, (req, res) => {
   res.json({
     message: "OK",
+  });
+});
+
+app.get("/heroes", (req, res) => {
+  res.json({
+    superHeroes,
+  });
+});
+
+app.get("/heroes/:name", (req, res) => {
+  let heroName = req.params;
+  let hero = superHeroes.filter(
+    (hero) =>
+      hero.name.toLocaleLowerCase().replace(/\s+/g, "") === heroName.name
+  );
+  res.json({
+    hero,
   });
 });
 
