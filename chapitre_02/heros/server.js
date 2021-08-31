@@ -85,6 +85,26 @@ const checkHeroRemove = (req, res, next) => {
     }
   }
 };
+// Middleware to check body format
+const validateHero = (req, res, next) => {
+  const newHero = req.body;
+  console.log(newHero);
+  if (
+    typeof newHero.name === "string" &&
+    typeof newHero.power === "object" &&
+    typeof newHero.color === "string" &&
+    typeof newHero.isAlive === "boolean" &&
+    typeof newHero.age === "number" &&
+    typeof newHero.image === "string"
+  ) {
+    return next();
+  } else {
+    return res.json({
+      message:
+        "The format of your new hero is not valid. Make sure it contains: a name (string), power(s) (array), a color (string), isAlive (boolean), an age (number), an image (string)",
+    });
+  }
+};
 
 // ROUTES
 //Global
@@ -133,7 +153,7 @@ app.delete("/heroes/:name", checkHeroRemove, (req, res) => {
   });
 });
 // Replace Hero
-app.put("/heroes/:name", (req, res) => {
+app.put("/heroes/:name", validateHero, (req, res) => {
   let heroName = req.params;
   let newHero = req.body;
   console.log(newHero);
@@ -146,7 +166,7 @@ app.put("/heroes/:name", (req, res) => {
   superHeroes = newSuperHeroes;
   console.log(newSuperHeroes);
   res.json({
-    message: `${heroName} a bien été remplacé`,
+    message: `${heroName.name} a bien été remplacé`,
     preuve: superHeroes,
   });
 });
