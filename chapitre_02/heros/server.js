@@ -1,8 +1,13 @@
 const express = require("express");
-const morgan = require("morgan");
 const app = express();
+const morgan = require("morgan");
+const cors = require("cors");
 // Port
 const PORT = 3002;
+
+app.use(express.json());
+app.use(morgan("tiny"));
+app.use(cors());
 
 const superHeroes = [
   {
@@ -33,9 +38,6 @@ const superHeroes = [
       "https://aws.vdkimg.com/film/2/5/1/1/251170_backdrop_scale_1280xauto.jpg",
   },
 ];
-
-app.use(express.json());
-app.use(morgan("tiny"));
 
 const debug = (req, res, next) => {
   const auth = true;
@@ -97,6 +99,19 @@ app.get("/heroes/:name/power", (req, res) => {
   );
   res.json({
     power: hero[0].power,
+  });
+});
+app.patch("/heroes/:name/power", (req, res) => {
+  let heroName = req.params;
+  let hero = superHeroes.filter(
+    (hero) =>
+      hero.name.toLocaleLowerCase().replace(/\s+/g, "") === heroName.name
+  );
+  let newPower = hero[0].power;
+  newPower = newPower.push("blabla");
+  console.log(hero[0].power);
+  res.json({
+    message: "Pouvoir ajouté !",
   });
 });
 
