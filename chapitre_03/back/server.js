@@ -17,6 +17,8 @@ app.use(morgan("tiny"));
 app.use(express.static("public"));
 app.use(cors());
 
+const rename = (req, res, next) => {};
+
 // Routes
 app.get("/", (req, res) => {
   res.json({
@@ -32,13 +34,17 @@ app.post("/user", upload.single("image"), (req, res) => {
   console.log("username is", username);
   console.log("profile pic is", profilePic);
   // Photo to original format
-  fs.renameSync(
-    profilePic.path,
-    path.join(profilePic.destination, profilePic.originalname)
-  );
+  let date = new Date();
+  date = date.toLocaleDateString().replace(/\//g, "-");
+  let extension = profilePic.originalname.split(".")[1];
+  let imgName = `${username.name.toLowerCase()}-${date}.${extension}`;
+  let newPath = `public/uploads/${imgName}`;
+  console.log("new path is", newPath);
+
+  fs.renameSync(req.file.path, path.join(req.file.destination, imgName));
+
   // Save users
   users.push(username);
-  console.log(users);
   // Response
   res.json({
     status: "OK",
