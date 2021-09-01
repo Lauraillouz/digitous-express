@@ -1,7 +1,7 @@
 const express = require("express");
-const app = express();
 const morgan = require("morgan");
 const cors = require("cors");
+const app = express();
 // Port
 const PORT = 3002;
 
@@ -108,14 +108,14 @@ const validateHero = (req, res, next) => {
 
 // ROUTES
 //Global
-app.get("/", debug, (req, res) => {
+app.get("/", debug, (_req, res) => {
   res.json({
     message: "OK",
   });
 });
 
 // All heroes
-app.get("/heroes", (req, res) => {
+app.get("/heroes", (_req, res) => {
   res.json({
     superHeroes,
   });

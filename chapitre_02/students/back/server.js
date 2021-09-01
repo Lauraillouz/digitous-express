@@ -10,13 +10,13 @@ app.use(express.json());
 app.use(cors());
 
 // Middleware global
-app.use((req, res, next) => {
+app.use((_req, _res, next) => {
   console.log("Yas");
   next();
 });
 
 //Routes
-app.get("/students", (req, res) => {
+app.get("/students", (_req, res) => {
   res.json({
     students,
   });
