@@ -1,6 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
 const multer = require("multer");
+const cors = require("cors");
 const fs = require("fs");
 const path = require("path");
 const PORT = 3000;
@@ -11,6 +12,7 @@ const upload = multer({ dest: "public/uploads" });
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(express.static("public"));
+app.use(cors());
 
 // Routes
 app.get("/", (_req, res) => {
@@ -24,10 +26,10 @@ app.post("/user", upload.single("image"), (req, res) => {
   let profilePic = req.file;
   console.log("username is", username);
   console.log("profile pic is", profilePic);
-  /*   fs.renameSync(
-    req.file.path,
-    path.join(req.file.destination, req.file.originalname)
-  ); */
+  fs.renameSync(
+    profilePic.path,
+    path.join(profilePic.destination, profilePic.originalname)
+  );
   res.json({
     status: "OK",
   });

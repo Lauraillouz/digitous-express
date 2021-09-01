@@ -1,0 +1,21 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  padding: 1rem;
+  font-family: sans-serif;
+}
+
+.textInput {
+  margin: 1rem;
+}
+.btn {
+  margin-top: 2rem;
+  padding: 5px;
+  border-radius: 10px;
+  border: 0.5px solid;
+  background-color: lightcyan;
+  color: grey;
+}

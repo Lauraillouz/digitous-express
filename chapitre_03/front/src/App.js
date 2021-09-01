@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 
 const App = () => {
@@ -21,6 +21,7 @@ const App = () => {
   const handleClick = () => {
     const formData = new FormData();
     formData.append("image", img);
+
     fetch("http://localhost:3000/user", {
       method: "POST",
       body: formData,
@@ -29,13 +30,15 @@ const App = () => {
 
   return (
     <div>
-      <input type="text" onChange={handleChangeUser} />
+      <label>Enter your username:</label>
+      <input type="text" onChange={handleChangeUser} className="textInput" />
       <div>
+        <label>Upload your profile pic: </label>
         <input type="file" onChange={handleChangeImg} />
-        <button type="submit" onClick={handleClick}>
-          Send
-        </button>
       </div>
+      <button type="submit" onClick={handleClick} className="btn">
+        Send
+      </button>
     </div>
   );
 };
