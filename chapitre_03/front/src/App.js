@@ -22,7 +22,7 @@ const App = () => {
     const formData = new FormData();
     formData.append("image", img);
 
-    fetch("http://localhost:3000/user", {
+    fetch(`http://localhost:3000/user/?name=${username}`, {
       method: "POST",
       body: formData,
     });
