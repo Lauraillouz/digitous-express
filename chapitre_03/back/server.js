@@ -17,8 +17,6 @@ app.use(morgan("tiny"));
 app.use(express.static("public"));
 app.use(cors());
 
-const rename = (req, res, next) => {};
-
 // Routes
 app.get("/", (req, res) => {
   res.json({
