@@ -22,9 +22,9 @@ app.get("/", (_req, res) => {
 app.post("/user", upload.single("image"), (req, res) => {
   let username = req.query;
   let profilePic = req.file;
-  console.log(username);
-  console.log(profilePic);
-  /* fs.renameSync(
+  console.log("username is", username);
+  console.log("profile pic is", profilePic);
+  /*   fs.renameSync(
     req.file.path,
     path.join(req.file.destination, req.file.originalname)
   ); */
