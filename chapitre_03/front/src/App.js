@@ -4,11 +4,23 @@ import "./App.css";
 const App = () => {
   const [img, setImg] = useState();
   const [username, setUsername] = useState();
+  const [users, setUsers] = useState();
 
-  /*   useEffect(() => {
-    console.log(img);
-    console.log(username);
-  }, [img, username]); */
+  const getUsers = () => {
+    fetch("http://localhost:3000/", { method: "GET" })
+      .then((res) => res.json())
+      .then((res) => {
+        setUsers(res.users);
+      });
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  useEffect(() => {
+    getUsers();
+  }, [users]);
 
   const handleChangeImg = (e) => {
     setImg(e.target.files[0]);
@@ -30,6 +42,18 @@ const App = () => {
 
   return (
     <div>
+      <div>
+        <h3>Existing users: </h3>
+        {users
+          ? users.map((user) => {
+              return (
+                <div>
+                  <p>{user.name}</p>
+                </div>
+              );
+            })
+          : null}
+      </div>
       <label>Enter your username:</label>
       <input type="text" onChange={handleChangeUser} className="textInput" />
       <div>

@@ -9,7 +9,7 @@ const app = express();
 const upload = multer({ dest: "public/uploads" });
 
 // Users
-const users = [];
+const users = [{ name: "Bli" }, { name: "Bla" }, { name: "Blou" }];
 
 // Middlewares
 app.use(express.json());
@@ -18,9 +18,10 @@ app.use(express.static("public"));
 app.use(cors());
 
 // Routes
-app.get("/", (_req, res) => {
+app.get("/", (req, res) => {
   res.json({
     status: "OK",
+    users: users,
   });
 });
 
