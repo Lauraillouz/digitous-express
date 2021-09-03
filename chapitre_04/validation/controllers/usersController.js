@@ -31,7 +31,29 @@ const getOneUser = (req, res) => {
   const user = users.find((user) => {
     return user.username.toLowerCase() === userName.toLowerCase();
   });
-  console.log(user);
+  res.json({
+    status: "OK",
+    data: user,
+  });
+};
+
+const getUserById = (req, res) => {
+  const id = req.params.id;
+  const user = users.filter((_user, index) => {
+    return index + 1 === parseInt(id);
+  });
+  res.json({
+    status: "OK",
+    data: user,
+  });
+};
+
+const getUserByEmail = (req, res) => {
+  const email = req.params.email;
+  const user = users.filter((user) => {
+    console.log(user.mail);
+    return user.email === email;
+  });
   res.json({
     status: "OK",
     data: user,
@@ -51,5 +73,7 @@ const newUser = (req, res) => {
 module.exports = {
   getAllUsers: getAllUsers,
   getOneUser: getOneUser,
+  getUserById: getUserById,
+  getUserByEmail: getUserByEmail,
   newUser: newUser,
 };

@@ -8,6 +8,8 @@ const usersController = require("../controllers/usersController");
 // GET
 router.get("/", usersController.getAllUsers);
 router.get("/:username", usersController.getOneUser);
+router.get("/id/:id", usersController.getUserById);
+router.get("/email/:email", usersController.getUserByEmail);
 
 // POST
 router.post(
