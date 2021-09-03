@@ -1,4 +1,5 @@
 const express = require("express");
+const { sanitizeBody } = require("express-validator");
 const router = express.Router();
 // Libraries
 const expressValidator = require("express-validator");
@@ -15,18 +16,26 @@ router.get("/email/:email", usersController.getUserByEmail);
 router.post(
   "/",
   expressValidator.body("email").isEmail(),
-  expressValidator.body("username").custom((value) => {
-    const schema = value.length > 4;
-    return schema;
-  }),
+  expressValidator
+    .body("username")
+    .trim()
+    .custom((value) => {
+      const schema = value.length > 4;
+      return schema;
+    }),
   expressValidator.body("age").custom((value) => {
     const schema = value >= 10 && typeof value === "number";
     return schema;
   }),
-  expressValidator.body("city").custom((value) => {
-    const schema = typeof value === "string";
-    return schema;
-  }),
+  expressValidator
+    .body("city")
+    .trim()
+    .not()
+    .isEmpty()
+    .custom((value) => {
+      const schema = typeof value === "string";
+      return schema;
+    }),
   (req, res) => {
     const errors = expressValidator.validationResult(req);
 
@@ -44,6 +53,10 @@ router.post(
       });
     }
   },
+  sanitizeBody("email").normalizeEmail(),
+  sanitizeBody("username").escape(),
+  sanitizeBody("age").escape(),
+  sanitizeBody("city").escape(),
   usersController.newUser
 );
 
