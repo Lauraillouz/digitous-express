@@ -4,8 +4,6 @@ const app = express();
 const PORT = 3000;
 // Routers
 const usersRouter = require("./routers/usersRouter");
-// Libraries
-const expressValidator = require("express-validator");
 
 // Middlewares
 app.use(express.json());
