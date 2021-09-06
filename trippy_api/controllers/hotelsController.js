@@ -34,6 +34,8 @@ const hotels = [
   },
 ];
 
+//
+// GET //
 const getAllHotels = (_req, res) => {
   res.json({
     statuts: "OK",
@@ -53,6 +55,30 @@ const getHotelById = (req, res) => {
   });
 };
 
+const getHotelByStarsAndCity = (req, res) => {
+  const stars = req.query.stars;
+  const city = req.query.city;
+  console.log(stars);
+  console.log(city);
+
+  const filteredHotels = hotels.filter((hotel) => {
+    return hotel.stars === parseInt(stars) && hotel.city.toLowerCase() === city;
+  });
+
+  if (filteredHotels.length > 0) {
+    res.json({
+      status: "Found at least a match",
+      data: filteredHotels,
+    });
+  } else {
+    res.json({
+      status: "No match found",
+    });
+  }
+};
+
+//
+// POST //
 const newHotel = (req, res) => {
   const newHotel = req.body;
   hotels.push(newHotel);
@@ -63,6 +89,8 @@ const newHotel = (req, res) => {
   });
 };
 
+//
+// PUT //
 const changeHotelName = (req, res) => {
   const id = req.params.id;
   const newName = req.query.name;
@@ -77,6 +105,8 @@ const changeHotelName = (req, res) => {
   });
 };
 
+//
+// DELETE //
 const deleteHotel = (req, res) => {
   const id = req.params.id;
   const newHotels = hotels.filter((hotel) => {
@@ -94,4 +124,5 @@ module.exports = {
   newHotel: newHotel,
   changeHotelName: changeHotelName,
   deleteHotel: deleteHotel,
+  getHotelByStarsAndCity: getHotelByStarsAndCity,
 };
