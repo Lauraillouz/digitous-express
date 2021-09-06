@@ -53,7 +53,33 @@ const getHotelById = (req, res) => {
   });
 };
 
+const newHotel = (req, res) => {
+  const newHotel = req.body;
+  hotels.push(newHotel);
+
+  res.json({
+    status: "New hotel successfully created",
+    data: newHotel,
+  });
+};
+
+const changeHotelName = (req, res) => {
+  const id = req.params.id;
+  const newName = req.query.name;
+
+  const hotel = hotels.filter((hotel) => {
+    return hotel.id === parseInt(id);
+  });
+  hotel[0].name = newName;
+  res.json({
+    status: "Hotel's name successfully updated",
+    data: hotel,
+  });
+};
+
 module.exports = {
   getAllHotels: getAllHotels,
   getHotelById: getHotelById,
+  newHotel: newHotel,
+  changeHotelName: changeHotelName,
 };
