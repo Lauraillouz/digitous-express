@@ -70,6 +70,22 @@ const getHotelById = (req, res) => {
   });
 };
 
+const getHotelByStars = (req, res) => {
+  const orderSort = req.query.sort;
+
+  // Sort hotels by stars
+  if (orderSort === "DSC") {
+    hotels.sort((a, b) => b.stars - a.stars);
+    console.log(orderSort === "DSC");
+  }
+  console.log(hotels);
+
+  res.json({
+    status: "Hotels successfully sorted",
+    data: hotels,
+  });
+};
+
 //
 // POST //
 const newHotel = (req, res) => {
@@ -117,4 +133,5 @@ module.exports = {
   newHotel: newHotel,
   changeHotelName: changeHotelName,
   deleteHotel: deleteHotel,
+  getHotelByStars: getHotelByStars,
 };

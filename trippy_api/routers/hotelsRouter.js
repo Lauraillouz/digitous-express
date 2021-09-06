@@ -6,6 +6,7 @@ const hotelsControllers = require("../controllers/hotelsController");
 
 // GET
 router.get("/", hotelsControllers.getHotels);
+router.get("/stars", hotelsControllers.getHotelByStars);
 router.get("/:id", hotelsControllers.getHotelById);
 
 // POST
