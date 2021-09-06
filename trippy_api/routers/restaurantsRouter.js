@@ -25,13 +25,15 @@ router.post(
     .body("priceCategory")
     .isInt({ min: 1, max: 3 })
     .withMessage("Must be a number between 1 and 3"),
-  (req, res) => {
+  (req, res, next) => {
     const errors = expressValidator.validationResult(req);
     if (!errors.isEmpty()) {
       res.json({
         status: "Error",
         message: errors,
       });
+    } else {
+      next();
     }
   },
   restaurantsController.newRestaurant
