@@ -39,7 +39,7 @@ let superHeroes = [
   },
 ];
 
-const debug = (req, res, next) => {
+const debug = (_req, _res, next) => {
   const auth = true;
   if (auth) {
     console.log("Server has been sollicitated");
@@ -47,13 +47,14 @@ const debug = (req, res, next) => {
   } else {
     console.log("Server has not been sollicitated");
   }
+  next();
 };
 // Middleware global
-app.use((req, res, next) => {
+app.use((_req, _res, next) => {
   next();
 });
 // Middleware to Lowercase
-const transformName = (req, res, next) => {
+const transformName = (req, _res, next) => {
   req.body.name = req.body.name.toLowerCase();
   next();
 };
@@ -117,11 +118,12 @@ app.get("/", debug, (_req, res) => {
 // All heroes
 app.get("/heroes", (_req, res) => {
   res.json({
-    superHeroes,
+    status: "OK",
+    data: superHeroes,
   });
 });
 // Add Hero
-app.patch("/heroes", transformName, checkHeroAdd, (req, res) => {
+app.post("/heroes", transformName, checkHeroAdd, (req, res) => {
   const newHero = req.body;
   superHeroes.push(newHero);
   res.json({
@@ -132,19 +134,21 @@ app.patch("/heroes", transformName, checkHeroAdd, (req, res) => {
 
 // Hero by name
 app.get("/heroes/:name", (req, res) => {
-  let heroName = req.params;
-  let hero = superHeroes.filter(
-    (hero) => hero.name.toLocaleLowerCase().replace(" ", "") === heroName.name
+  const heroName = req.params;
+  const hero = superHeroes.filter(
+    (hero) =>
+      hero.name.toLowerCase().replace(" ", "") === heroName.name.toLowerCase()
   );
   res.json({
-    hero,
+    status: "OK",
+    data: [hero],
   });
 });
 // Delete Hero
 app.delete("/heroes/:name", checkHeroRemove, (req, res) => {
   let heroName = req.params;
   let heroesFiltered = superHeroes.filter((hero) => {
-    return hero.name.toLocaleLowerCase().replace(" ", "") !== heroName.name;
+    return hero.name.toLowerCase().replace(" ", "") !== heroName.name;
   });
   superHeroes = heroesFiltered;
   res.json({
@@ -158,7 +162,7 @@ app.put("/heroes/:name", validateHero, (req, res) => {
   let newHero = req.body;
   console.log(newHero);
   let newSuperHeroes = superHeroes.map((hero) => {
-    if (hero.name.toLocaleLowerCase().replace(" ", "") === heroName.name) {
+    if (hero.name.toLowerCase().replace(" ", "") === heroName.name) {
       return (hero = newHero);
     }
     return hero;
@@ -175,22 +179,21 @@ app.put("/heroes/:name", validateHero, (req, res) => {
 app.get("/heroes/:name/power", (req, res) => {
   let heroName = req.params;
   let hero = superHeroes.filter(
-    (hero) =>
-      hero.name.toLocaleLowerCase().replace(/\s+/g, "") === heroName.name
+    (hero) => hero.name.toLowerCase().replace(/\s+/g, "") === heroName.name
   );
   res.json({
-    power: hero[0].power,
+    status: "OK",
+    heroName: heroName,
+    data: hero[0].power,
   });
 });
 // Add new power
 app.patch("/heroes/:name/power", (req, res) => {
   let heroName = req.params;
   let hero = superHeroes.filter(
-    (hero) =>
-      hero.name.toLocaleLowerCase().replace(/\s+/g, "") === heroName.name
+    (hero) => hero.name.toLowerCase().replace(/\s+/g, "") === heroName.name
   );
-  let newPower = hero[0].power;
-  newPower = newPower.push("blabla");
+  hero[0].power.push("blabla");
   res.json({
     message: "Pouvoir ajouté !",
     preuve: superHeroes,
@@ -201,7 +204,7 @@ app.delete("/heroes/:name/power/:power", (req, res) => {
   let powerToRemove = req.params.power;
   let hero = superHeroes.filter((hero) => {
     console.log(hero.power);
-    return hero.name.toLocaleLowerCase().replace(/\s+/g, "") === heroName;
+    return hero.name.toLowerCase().replace(/\s+/g, "") === heroName;
   });
   let newPowers = hero[0].power.filter((power) => {
     return power !== powerToRemove;
