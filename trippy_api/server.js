@@ -20,7 +20,9 @@ app.get("/", (_req, res) => {
 
 // Routes
 app.use("/hotels", hotelsRouter);
+app.use("/restaurants", restaurantsRouter);
 
+// Listening on PORT
 app.listen(PORT, () => {
   console.log(`Listening on ${PORT}`);
 });
