@@ -36,11 +36,26 @@ const hotels = [
 
 //
 // GET //
-const getAllHotels = (_req, res) => {
-  res.json({
-    statuts: "OK",
-    data: hotels,
+const getHotels = (req, res) => {
+  const stars = req.query.stars;
+  const city = req.query.city;
+
+  // Filter hotels by stars & city
+  const filteredHotels = hotels.filter((hotel) => {
+    return hotel.stars === parseInt(stars) && hotel.city.toLowerCase() === city;
   });
+
+  if (stars && city) {
+    return res.json({
+      status: "Found matching data",
+      data: filteredHotels,
+    });
+  } else {
+    res.json({
+      statuts: "OK",
+      data: hotels,
+    });
+  }
 };
 
 const getHotelById = (req, res) => {
@@ -53,28 +68,6 @@ const getHotelById = (req, res) => {
     status: "OK",
     data: hotel,
   });
-};
-
-const getHotelByStarsAndCity = (req, res) => {
-  const stars = req.query.stars;
-  const city = req.query.city;
-  console.log(stars);
-  console.log(city);
-
-  const filteredHotels = hotels.filter((hotel) => {
-    return hotel.stars === parseInt(stars) && hotel.city.toLowerCase() === city;
-  });
-
-  if (filteredHotels.length > 0) {
-    res.json({
-      status: "Found at least a match",
-      data: filteredHotels,
-    });
-  } else {
-    res.json({
-      status: "No match found",
-    });
-  }
 };
 
 //
@@ -119,10 +112,9 @@ const deleteHotel = (req, res) => {
 };
 
 module.exports = {
-  getAllHotels: getAllHotels,
+  getHotels: getHotels,
   getHotelById: getHotelById,
   newHotel: newHotel,
   changeHotelName: changeHotelName,
   deleteHotel: deleteHotel,
-  getHotelByStarsAndCity: getHotelByStarsAndCity,
 };

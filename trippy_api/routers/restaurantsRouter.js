@@ -5,7 +5,7 @@ const router = express.Router();
 const restaurantsController = require("../controllers/restaurantsController");
 
 // GET
-router.get("/", restaurantsController.getAllRestaurants);
+router.get("/", restaurantsController.getRestaurants);
 router.get("/:id", restaurantsController.getRestaurantById);
 
 // POST

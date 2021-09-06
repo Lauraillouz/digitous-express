@@ -5,11 +5,7 @@ const router = express.Router();
 const hotelsControllers = require("../controllers/hotelsController");
 
 // GET
-router.get(
-  "/",
-  hotelsControllers.getHotelByStarsAndCity,
-  hotelsControllers.getAllHotels
-);
+router.get("/", hotelsControllers.getHotels);
 router.get("/:id", hotelsControllers.getHotelById);
 
 // POST

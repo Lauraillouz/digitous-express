@@ -16,7 +16,7 @@ const restaurants = [
     city: "New York",
     country: "US",
     stars: 5,
-    cusine: "burger",
+    cuisine: "burger",
     priceCategory: 1,
   },
   {
@@ -31,11 +31,43 @@ const restaurants = [
   },
 ];
 
-const getAllRestaurants = (_req, res) => {
-  res.json({
-    status: "OK",
-    data: restaurants,
+const getRestaurants = (req, res) => {
+  const cuisine = req.query.cuisine;
+  const city = req.query.city;
+  const limit = req.query.limit;
+  const stars = req.query.stars;
+
+  // Get restaurants by cuisine & city
+  let filteredRestaurants = restaurants.filter((restaurant) => {
+    return (
+      restaurant.cuisine === cuisine &&
+      restaurant.city.replace(" ", "").toLowerCase() === city
+    );
   });
+
+  // Get restaurants by stars and limited number
+  let limitedRestaurants = restaurants.filter((restaurant) => {
+    return restaurant.stars === parseInt(stars);
+  });
+  limitedRestaurants = limitedRestaurants.splice(0, limit);
+
+  // Return
+  if (cuisine && city) {
+    return res.json({
+      status: "Found matching data",
+      data: filteredRestaurants,
+    });
+  } else if (limit) {
+    return res.json({
+      status: "Limited results received",
+      data: limitedRestaurants,
+    });
+  } else {
+    res.json({
+      status: "OK",
+      data: restaurants,
+    });
+  }
 };
 
 const getRestaurantById = (req, res) => {
@@ -86,7 +118,7 @@ const deleteRestaurant = (req, res) => {
 };
 
 module.exports = {
-  getAllRestaurants: getAllRestaurants,
+  getRestaurants: getRestaurants,
   getRestaurantById: getRestaurantById,
   newRestaurant: newRestaurant,
   changeRestaurantName: changeRestaurantName,
