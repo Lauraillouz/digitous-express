@@ -77,9 +77,21 @@ const changeHotelName = (req, res) => {
   });
 };
 
+const deleteHotel = (req, res) => {
+  const id = req.params.id;
+  const newHotels = hotels.filter((hotel) => {
+    return hotel.id !== parseInt(id);
+  });
+  res.json({
+    status: "Hotel has successfully been removed",
+    data: newHotels,
+  });
+};
+
 module.exports = {
   getAllHotels: getAllHotels,
   getHotelById: getHotelById,
   newHotel: newHotel,
   changeHotelName: changeHotelName,
+  deleteHotel: deleteHotel,
 };

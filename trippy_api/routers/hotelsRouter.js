@@ -14,4 +14,7 @@ router.post("/", hotelsControllers.newHotel);
 // PUT
 router.put("/:id", hotelsControllers.changeHotelName);
 
+// DELETE
+router.delete("/:id", hotelsControllers.deleteHotel);
+
 module.exports = router;
