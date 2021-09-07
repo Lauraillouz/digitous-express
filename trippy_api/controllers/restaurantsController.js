@@ -31,6 +31,8 @@ const restaurants = [
   },
 ];
 
+//
+// GET //
 const getRestaurants = (req, res) => {
   const cuisine = req.query.cuisine;
   const city = req.query.city;
@@ -81,6 +83,8 @@ const getRestaurantById = (req, res) => {
   });
 };
 
+//
+// POST //
 const newRestaurant = (req, res) => {
   const newRestaurant = req.body;
   restaurants.push(newRestaurant);
@@ -91,13 +95,22 @@ const newRestaurant = (req, res) => {
   });
 };
 
+//
+// PUT //
 const changeRestaurantName = (req, res) => {
   const id = req.params.id;
-  const newName = req.query.name;
-  const restaurant = restaurants.filter((restaurant) => {
+  const queries = req.query;
+
+  const queriesKeys = Object.keys(queries);
+  console.log("queries keys are", queriesKeys);
+
+  const restaurant = restaurants.find((restaurant) => {
     return restaurant.id === parseInt(id);
   });
-  restaurant[0].name = newName;
+
+  queriesKeys.map((value) => {
+    return (restaurant[value] = queries[value]);
+  });
 
   res.json({
     status: "Restaurant's name successfully updated",
@@ -105,6 +118,8 @@ const changeRestaurantName = (req, res) => {
   });
 };
 
+//
+// DELETE //
 const deleteRestaurant = (req, res) => {
   const id = req.params.id;
   const newRestaurants = restaurants.filter((restaurant) => {
