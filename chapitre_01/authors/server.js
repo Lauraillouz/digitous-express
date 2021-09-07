@@ -1,55 +1,80 @@
 const express = require("express");
 const app = express();
-
+const morgan = require("morgan");
+const dotenv = require("dotenv");
+dotenv.config({
+  path: "./config.env",
+});
+const mongoose = require("mongoose");
 var authors = require("./authors.js");
 
+// Connexion à MongoDB
+mongoose
+  .connect(process.env.DB, {
+    useNewUrlParser: true,
+  })
+  .then(() => {
+    console.log("Connected to MongoDB !");
+  });
 
+// Middlewares
+app.use(express.json());
+app.use(morgan("tiny"));
 
-// Exercie 1 - Route homepage
-app.get("/", (req, res) => {
-    res.send("Authors API");
+// Mongoose - Schéma
+const AuthorSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  nationality: String,
+  books: Array,
 });
 
+// Mongoose - Modèle
+const Author = mongoose.model("Author", AuthorSchema);
 
-
-// Exercice 2 - Routes auteurs
-app.get("/authors/:authorId/", (req, res) => {
-    let authorId = req.params.authorId;
-    let author = authors[authorId -1];
-    res.send(`${author.name}, ${author.nationality}`);
+// GET
+app.get("/", (_req, res) => {
+  res.json({
+    status: "OK",
+    message: "Authors API",
+  });
 });
 
-
-
-// Exercice 3 - Routes livres
-app.get("/authors/:authorId/books/", (req, res) => {
-    let authorId = req.params.authorId;
-    let author = authors[authorId -1];
-    res.send(`${author.books.join(", ")}`);
+app.get("/authors", async (_req, res) => {
+  const authors = await Author.find();
+  res.json({
+    status: "OK",
+    data: authors,
+  });
 });
 
+app.get("/authors/:id/", async (req, res) => {
+  let author = await Author.findById(req.params.id);
+  res.json({
+    status: "OK",
+    data: author,
+  });
+});
 
+app.get("/authors/:id/books/", async (req, res) => {
+  let author = await Author.findById(req.params.id);
+  res.json({
+    status: "OK",
+    data: author.books,
+  });
+});
 
-// Exercice 4 - Routes json
-app.get("/json/authors/:id", (req, res) => {
-    let id = req.params.id;
-    let author = authors[id -1];
-    res.json({
-        name: author.name,
-        nationality: author.nationality
-    });
-})
+// POST
+app.post("/authors", async (req, res) => {
+  await Author.create(req.body);
 
-app.get("/json/authors/:id/books", (req, res) => {
-    let id = req.params.id;
-    let author = authors[id -1];
-    res.json({
-        books: author.books
-    })
-})
-
-
+  res.json({
+    status: "Author created",
+  });
+});
 
 app.listen(3000, () => {
-    console.log("Listening on port 3000");
+  console.log("Listening on port 3000");
 });
