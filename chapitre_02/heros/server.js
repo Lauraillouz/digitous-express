@@ -1,43 +1,38 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const dotenv = require("dotenv");
+dotenv.config({
+  path: "./config.env",
+});
+const mongoose = require("mongoose");
+mongoose
+  .connect(process.env.DB, {
+    useNewUrlParser: true,
+  })
+  .then(() => {
+    console.log("Connected to MongDB");
+  });
 const app = express();
-// Port
-const PORT = 3002;
 
+// Port
+
+// Middlewares
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(cors());
 
-let superHeroes = [
-  {
-    name: "Iron Man",
-    power: ["money"],
-    color: "red",
-    isAlive: true,
-    age: 46,
-    image:
-      "https://blog.fr.playstation.com/tachyon/sites/10/2019/07/unnamed-file-18.jpg?resize=1088,500&crop_strategy=smart",
-  },
-  {
-    name: "Thor",
-    power: ["electricity", "worthy"],
-    color: "blue",
-    isAlive: true,
-    age: 300,
-    image:
-      "https://www.bdfugue.com/media/catalog/product/cache/1/image/400x/17f82f742ffe127f42dca9de82fb58b1/9/7/9782809465761_1_75.jpg",
-  },
-  {
-    name: "Daredevil",
-    power: ["blind"],
-    color: "red",
-    isAlive: false,
-    age: 30,
-    image:
-      "https://aws.vdkimg.com/film/2/5/1/1/251170_backdrop_scale_1280xauto.jpg",
-  },
-];
+// Schéma
+const SuperheroSchema = new mongoose.Schema({
+  name: String,
+  power: Array,
+  color: String,
+  isAlive: Boolean,
+  age: Number,
+  image: String,
+});
+// Modèle
+const Superhero = mongoose.model("Superhero", SuperheroSchema);
 
 const debug = (_req, _res, next) => {
   const auth = true;
@@ -59,7 +54,7 @@ const transformName = (req, _res, next) => {
   next();
 };
 // Middleware to check if hero already exists before add
-const checkHeroAdd = (req, res, next) => {
+/* const checkHeroAdd = (req, res, next) => {
   const newHero = req.body;
   superHeroes.map((hero) => {
     if (hero.name.toLowerCase().replace(" ", "") === newHero.name) {
@@ -85,101 +80,95 @@ const checkHeroRemove = (req, res, next) => {
       });
     }
   }
-};
-// Middleware to check body format
-const validateHero = (req, res, next) => {
-  const newHero = req.body;
-  console.log(newHero);
-  if (
-    typeof newHero.name === "string" &&
-    typeof newHero.power === "object" &&
-    typeof newHero.color === "string" &&
-    typeof newHero.isAlive === "boolean" &&
-    typeof newHero.age === "number" &&
-    typeof newHero.image === "string"
-  ) {
-    return next();
-  } else {
-    return res.json({
-      message:
-        "The format of your new hero is not valid. Make sure it contains: a name (string), power(s) (array), a color (string), isAlive (boolean), an age (number), an image (string)",
-    });
-  }
-};
+}; */
 
 // ROUTES
 //Global
-app.get("/", debug, (_req, res) => {
-  res.json({
-    message: "OK",
-  });
-});
+app.get(
+  "/",
+  /* debug, */ (_req, res) => {
+    res.json({
+      message: "OK",
+    });
+  }
+);
 
 // All heroes
-app.get("/heroes", (_req, res) => {
+app.get("/heroes", async (_req, res) => {
+  const superheroes = await Superhero.find();
   res.json({
     status: "OK",
-    data: superHeroes,
+    data: superheroes,
   });
 });
 // Add Hero
-app.post("/heroes", transformName, checkHeroAdd, (req, res) => {
-  const newHero = req.body;
-  superHeroes.push(newHero);
-  res.json({
-    message: "Ok, héros ajouté",
-    preuve: superHeroes,
-  });
-});
+app.post(
+  "/heroes",
+  /* transformName, checkHeroAdd, */ async (req, res) => {
+    await Superhero.create(req.body);
+    res.json({
+      message: "Ok, héros ajouté",
+    });
+  }
+);
 
 // Hero by name
-app.get("/heroes/:name", (req, res) => {
-  const heroName = req.params;
-  const hero = superHeroes.filter(
-    (hero) =>
-      hero.name.toLowerCase().replace(" ", "") === heroName.name.toLowerCase()
-  );
+app.get("/heroes/:name", async (req, res) => {
+  const superheroes = await Superhero.find();
+  const superhero = await superheroes.filter((superhero) => {
+    return superhero.name.toLowerCase().replace(" ", "") === req.params.name;
+  });
   res.json({
     status: "OK",
-    data: [hero],
+    data: superhero,
   });
 });
 // Delete Hero
-app.delete("/heroes/:name", checkHeroRemove, (req, res) => {
-  let heroName = req.params;
-  let heroesFiltered = superHeroes.filter((hero) => {
-    return hero.name.toLowerCase().replace(" ", "") !== heroName.name;
-  });
-  superHeroes = heroesFiltered;
-  res.json({
-    message: `${heroName.name} effacé correctement`,
-    preuve: superHeroes,
-  });
-});
+app.delete(
+  "/heroes/:name",
+  /* checkHeroRemove, */ async (req, res) => {
+    const paramsName = req.params.name;
+    const superheroName =
+      paramsName.charAt(0).toUpperCase() + paramsName.slice(1);
+    console.log(superheroName);
+    await Superhero.deleteOne({ name: superheroName });
+    res.json({
+      message: `${superheroName} effacé correctement`,
+    });
+  }
+);
 // Replace Hero
-app.put("/heroes/:name", validateHero, (req, res) => {
-  let heroName = req.params;
-  let newHero = req.body;
-  console.log(newHero);
-  let newSuperHeroes = superHeroes.map((hero) => {
-    if (hero.name.toLowerCase().replace(" ", "") === heroName.name) {
-      return (hero = newHero);
-    }
-    return hero;
-  });
-  superHeroes = newSuperHeroes;
-  console.log(newSuperHeroes);
-  res.json({
-    message: `${heroName.name} a bien été remplacé`,
-    preuve: superHeroes,
-  });
-});
+app.put(
+  "/heroes/:name",
+  /* validateHero, */ async (req, res) => {
+    const heroName = req.params.name;
+    const newHero = req.body;
+    const superheroes = await Superhero.find();
+    const test = await Superhero.update(
+      { name: heroName },
+      { $set: { newHero } }
+    );
+
+    /*     let newSuperheroes = await superheroes.map((hero) => {
+      if (hero.name.toLowerCase().replace(" ", "") === heroName) {
+        return (hero = newHero);
+      }
+      return hero;
+    }); */
+
+    res.json({
+      message: `${heroName} a bien été remplacé`,
+      preuve: test,
+    });
+  }
+);
 
 // Hero's power
-app.get("/heroes/:name/power", (req, res) => {
-  let heroName = req.params;
-  let hero = superHeroes.filter(
-    (hero) => hero.name.toLowerCase().replace(/\s+/g, "") === heroName.name
+app.get("/heroes/:name/power", async (req, res) => {
+  const heroName = req.params.name;
+  const superheroes = await Superhero.find();
+  let hero = await superheroes.filter(
+    (hero) => hero.name.toLowerCase().replace(/\s+/g, "") === heroName
   );
   res.json({
     status: "OK",
@@ -188,15 +177,19 @@ app.get("/heroes/:name/power", (req, res) => {
   });
 });
 // Add new power
-app.patch("/heroes/:name/power", (req, res) => {
-  let heroName = req.params;
-  let hero = superHeroes.filter(
-    (hero) => hero.name.toLowerCase().replace(/\s+/g, "") === heroName.name
-  );
-  hero[0].power.push("blabla");
+app.patch("/heroes/:name/power", async (req, res) => {
+  const superheroes = await Superhero.find();
+  const heroName = req.params.name;
+  const newPower = req.body.power;
+  let hero = await superheroes.find((hero) => {
+    if (hero.name.toLowerCase().replace(" ", "") === heroName) {
+      return hero.power.push(newPower);
+    }
+  });
+  console.log(superheroes);
   res.json({
     message: "Pouvoir ajouté !",
-    preuve: superHeroes,
+    data: hero,
   });
 });
 app.delete("/heroes/:name/power/:power", (req, res) => {
@@ -217,6 +210,6 @@ app.delete("/heroes/:name/power/:power", (req, res) => {
 });
 
 // Listening Port
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log("Listening on port 5000");
 });
