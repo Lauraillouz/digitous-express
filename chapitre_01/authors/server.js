@@ -6,7 +6,6 @@ dotenv.config({
   path: "./config.env",
 });
 const mongoose = require("mongoose");
-var authors = require("./authors.js");
 
 // Connexion à MongoDB
 mongoose

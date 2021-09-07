@@ -6,15 +6,15 @@ var responseAPICountries = require("./dataCountries.js");
 
 // Route Homepage
 app.get("/", (req, res) => {
-    res.send("API Countries")
-})
+  res.send("API Countries");
+});
 
 // Route responseAPICountries
 app.get("/countries/", (req, res) => {
-    res.send(responseAPICountries);
-})
+  res.send(responseAPICountries);
+});
 
 // Écoute serveur
 app.listen(port, () => {
-    console.log(`Listening on port ${port}`);
+  console.log(`Listening on port ${port}`);
 });
