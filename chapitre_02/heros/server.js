@@ -141,71 +141,64 @@ app.delete(
 app.put(
   "/heroes/:name",
   /* validateHero, */ async (req, res) => {
-    const heroName = req.params.name;
+    const paramsName = req.params.name;
+    const superheroName =
+      paramsName.charAt(0).toUpperCase() + paramsName.slice(1);
     const newHero = req.body;
-    const superheroes = await Superhero.find();
-    const test = await Superhero.update(
-      { name: heroName },
-      { $set: { newHero } }
+    const updatedHero = await Superhero.replaceOne(
+      { name: superheroName },
+      newHero
     );
 
-    /*     let newSuperheroes = await superheroes.map((hero) => {
-      if (hero.name.toLowerCase().replace(" ", "") === heroName) {
-        return (hero = newHero);
-      }
-      return hero;
-    }); */
-
     res.json({
-      message: `${heroName} a bien été remplacé`,
-      preuve: test,
+      message: `${superheroName} a bien été remplacé`,
+      preuve: updatedHero,
     });
   }
 );
 
 // Hero's power
 app.get("/heroes/:name/power", async (req, res) => {
-  const heroName = req.params.name;
-  const superheroes = await Superhero.find();
-  let hero = await superheroes.filter(
-    (hero) => hero.name.toLowerCase().replace(/\s+/g, "") === heroName
-  );
+  const paramsName = req.params.name;
+  const superheroName =
+    paramsName.charAt(0).toUpperCase() + paramsName.slice(1);
+  const superhero = await Superhero.findOne({ name: superheroName });
+
   res.json({
-    status: "OK",
-    heroName: heroName,
-    data: hero[0].power,
+    status: "Here are your superhero's powers",
+    data: superhero.power,
   });
 });
 // Add new power
 app.patch("/heroes/:name/power", async (req, res) => {
-  const superheroes = await Superhero.find();
-  const heroName = req.params.name;
+  const paramsName = req.params.name;
+  const superheroName =
+    paramsName.charAt(0).toUpperCase() + paramsName.slice(1);
   const newPower = req.body.power;
-  let hero = await superheroes.find((hero) => {
-    if (hero.name.toLowerCase().replace(" ", "") === heroName) {
-      return hero.power.push(newPower);
-    }
-  });
-  console.log(superheroes);
+  await Superhero.updateOne(
+    { name: superheroName },
+    { $push: { power: newPower } }
+  );
+
   res.json({
     message: "Pouvoir ajouté !",
-    data: hero,
+    data: newPower,
   });
 });
-app.delete("/heroes/:name/power/:power", (req, res) => {
-  let heroName = req.params.name;
-  let powerToRemove = req.params.power;
-  let hero = superHeroes.filter((hero) => {
-    console.log(hero.power);
-    return hero.name.toLowerCase().replace(/\s+/g, "") === heroName;
-  });
-  let newPowers = hero[0].power.filter((power) => {
-    return power !== powerToRemove;
-  });
-  hero[0].power = newPowers;
+// Delete a power
+app.delete("/heroes/:name/power/:power", async (req, res) => {
+  const paramsName = req.params.name;
+  const superheroName =
+    paramsName.charAt(0).toUpperCase() + paramsName.slice(1);
+  const powerToRemove = req.params.power;
+  await Superhero.updateOne(
+    { name: superheroName },
+    { $pull: { power: powerToRemove } }
+  );
+
   res.json({
-    message: `Le pouvoir ${powerToRemove} de ${heroName} a bien été supprimé`,
-    preuve: superHeroes,
+    message: "Pourvoir supprimé !",
+    data: powerToRemove,
   });
 });
 
