@@ -18,10 +18,10 @@ router.post(
   expressValidator.body("email").isEmail(),
   expressValidator
     .body("username")
-    .trim()
+    .isString()
     .custom((value) => {
       const schema = value.length > 4;
-      return schema;
+      return schema.toLowerCase();
     }),
   expressValidator.body("age").custom((value) => {
     const schema = value >= 10 && typeof value === "number";
@@ -29,28 +29,22 @@ router.post(
   }),
   expressValidator
     .body("city")
-    .trim()
     .not()
     .isEmpty()
     .custom((value) => {
       const schema = typeof value === "string";
-      return schema;
+      return schema.toLowerCase();
     }),
-  (req, res) => {
+  (req, res, next) => {
     const errors = expressValidator.validationResult(req);
 
-    if (errors.isEmpty()) {
-      const newUser = req.body;
-      res.json({
-        status: "OK",
-        newUser: newUser,
-      });
-    } else {
-      console.log(errors);
+    if (!errors.isEmpty()) {
       res.json({
         status: "error",
         message: "Form is incorrect",
       });
+    } else {
+      next();
     }
   },
   sanitizeBody("email").normalizeEmail(),

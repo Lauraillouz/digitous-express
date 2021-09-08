@@ -1,7 +1,19 @@
 const express = require("express");
 const morgan = require("morgan");
+const dotenv = require("dotenv");
+dotenv.config({
+  path: "./config.env",
+});
+const mongoose = require("mongoose");
+mongoose
+  .connect(process.env.DB, {
+    useNewUrlParser: true,
+  })
+  .then(() => {
+    console.log("Connected to MongoDB");
+  });
 const app = express();
-const PORT = 3000;
+
 // Routers
 const usersRouter = require("./routers/usersRouter");
 
@@ -20,6 +32,7 @@ app.get("/", (_req, res) => {
 // Routes
 app.use("/users", usersRouter);
 
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
+// Port listening
+app.listen(process.env.PORT, () => {
+  console.log("Listening on port 3000");
 });

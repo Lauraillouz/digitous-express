@@ -1,72 +1,72 @@
-const users = [
-  {
-    username: "Bla",
-    email: "bla@test.com",
-    age: 80,
-    city: "Bla",
-  },
-  {
-    username: "Bli",
-    email: "bli@test.com",
-    age: 88,
-    city: "Bli",
-  },
-  {
-    username: "Blou",
-    email: "blou@test.com",
-    age: 88,
-    city: "Blou",
-  },
-];
+const mongoose = require("mongoose");
+const User = require("../models/userModel");
 
-const getAllUsers = (_req, res) => {
+const getAllUsers = async (_req, res) => {
+  const users = await User.find();
   res.json({
     status: "OK",
     data: users,
   });
 };
 
-const getOneUser = (req, res) => {
-  const userName = req.params.username;
-  const user = users.find((user) => {
-    return user.username.toLowerCase() === userName.toLowerCase();
-  });
-  res.json({
-    status: "OK",
-    data: user,
-  });
+const getOneUser = async (req, res) => {
+  const userName = req.params.username.toLowerCase();
+  console.log(userName);
+
+  const user = await User.findOne({ username: userName });
+  console.log(user);
+  if (user) {
+    return res.json({
+      status: "OK",
+      data: user,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "user not found",
+    });
+  }
 };
 
-const getUserById = (req, res) => {
+const getUserById = async (req, res) => {
   const id = req.params.id;
-  const user = users.filter((_user, index) => {
-    return index + 1 === parseInt(id);
-  });
-  res.json({
-    status: "OK",
-    data: user,
-  });
+
+  const user = await User.findOne({ _id: id });
+
+  if (user) {
+    return res.json({
+      status: "OK",
+      data: user,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "user not found",
+    });
+  }
 };
 
-const getUserByEmail = (req, res) => {
+const getUserByEmail = async (req, res) => {
   const email = req.params.email;
-  const user = users.filter((user) => {
-    console.log(user.mail);
-    return user.email === email;
-  });
-  res.json({
-    status: "OK",
-    data: user,
-  });
+  const user = await User.findOne({ email: email });
+  if (user) {
+    res.json({
+      status: "OK",
+      data: user,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "user not found",
+    });
+  }
 };
 
-const newUser = (req, res) => {
-  const newUser = req.body;
-  users.push(newUser);
+const newUser = async (req, res) => {
+  await User.create(req.body);
   res.json({
     status: "OK",
-    newUser: newUser,
-    data: users,
+    message: "New user created",
   });
 };
 
