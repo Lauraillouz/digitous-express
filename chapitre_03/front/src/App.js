@@ -19,7 +19,7 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    console.log(img);
+    console.log("img is", img);
   }, [img]);
 
   const handleChangeImg = (e) => {
@@ -51,7 +51,6 @@ const App = () => {
               return (
                 <div>
                   <p>{user.name}</p>
-                  <figure>{user.img}</figure>
                 </div>
               );
             })
