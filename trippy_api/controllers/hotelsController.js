@@ -1,56 +1,23 @@
-const hotels = [
-  {
-    id: 1,
-    name: "Imperial Hotel",
-    address: "84 av des Champs-Élysées",
-    city: "Paris",
-    country: "France",
-    stars: 5,
-    hasSpa: true,
-    hasPool: true,
-    priceCategory: 3,
-  },
-  {
-    id: 2,
-    name: "The Queen",
-    address: "3 Darwin Street",
-    city: "London",
-    country: "England",
-    stars: 4,
-    hasSpa: true,
-    hasPool: false,
-    priceCategory: 3,
-  },
-  {
-    id: 3,
-    name: "Kiwi land",
-    address: "4587 George St.",
-    city: "Auckland",
-    country: "New-Zealand",
-    stars: 3,
-    hasSpa: false,
-    hasPool: true,
-    priceCategory: 2,
-  },
-];
+const mongoose = require("mongoose");
+const Hotel = require("../models/hotelModel");
 
 //
 // GET //
-const getHotels = (req, res) => {
-  const stars = req.query.stars;
+const getHotels = async (req, res) => {
+  const stars = parseInt(req.query.stars);
   const city = req.query.city;
 
-  // Filter hotels by stars & city
-  const filteredHotels = hotels.filter((hotel) => {
-    return hotel.stars === parseInt(stars) && hotel.city.toLowerCase() === city;
-  });
-
   if (stars && city) {
+    const filteredHotels = await Hotel.find({
+      stars,
+      city: new RegExp(city, "i"),
+    });
     return res.json({
       status: "Found matching data",
       data: filteredHotels,
     });
   } else {
+    const hotels = await Hotel.find();
     res.json({
       statuts: "OK",
       data: hotels,
@@ -58,73 +25,89 @@ const getHotels = (req, res) => {
   }
 };
 
-const getHotelById = (req, res) => {
+const getHotelById = async (req, res) => {
   const id = req.params.id;
-  const hotel = hotels.filter((hotel) => {
-    return hotel.id === parseInt(id);
-  });
+  const hotel = await Hotel.findOne({ _id: id });
 
-  res.json({
-    status: "OK",
-    data: hotel,
-  });
+  if (hotel) {
+    res.json({
+      status: "OK",
+      data: hotel,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "This ID does not exist",
+    });
+  }
 };
 
-const getHotelByStars = (req, res) => {
+const getHotelByStars = async (req, res) => {
   const orderSort = req.query.sort;
 
   // Sort hotels by stars
   if (orderSort === "DSC") {
+    const hotels = await Hotel.find();
     hotels.sort((a, b) => b.stars - a.stars);
-    console.log(orderSort === "DSC");
+    res.json({
+      status: "Hotels successfully sorted",
+      data: hotels,
+    });
   }
-  console.log(hotels);
+};
+
+//
+// POST //
+const newHotel = async (req, res) => {
+  const newHotel = req.body;
+
+  const hotels = await Hotel.create(newHotel);
 
   res.json({
-    status: "Hotels successfully sorted",
+    status: "New hotel successfully created",
     data: hotels,
   });
 };
 
 //
-// POST //
-const newHotel = (req, res) => {
-  const newHotel = req.body;
-  hotels.push(newHotel);
-
-  res.json({
-    status: "New hotel successfully created",
-    data: newHotel,
-  });
-};
-
-//
 // PUT //
-const changeHotelName = (req, res) => {
-  const id = req.params.id;
+const changeHotelName = async (req, res) => {
+  const id = parseInt(req.params.id);
   const newName = req.query.name;
 
-  const hotel = hotels.filter((hotel) => {
-    return hotel.id === parseInt(id);
-  });
-  hotel[0].name = newName;
-  res.json({
-    status: "Hotel's name successfully updated",
-    data: hotel,
-  });
+  const hotel = await Hotel.updateOne({ id: id }, { name: newName });
+
+  if (hotel) {
+    const updatedHotel = await Hotel.findOne({ id: id });
+    res.json({
+      status: "Hotel's name successfully updated",
+      data: updatedHotel,
+    });
+  } else {
+    res.json({
+      status: "Something went wrong",
+    });
+  }
 };
 
 //
 // DELETE //
-const deleteHotel = (req, res) => {
-  const id = req.params.id;
-  const newHotels = hotels.filter((hotel) => {
-    return hotel.id !== parseInt(id);
-  });
-  res.json({
-    status: "Hotel has successfully been removed",
-    data: newHotels,
-  });
+const deleteHotel = async (req, res) => {
+  const id = parseInt(req.params.id);
+
+  const hotel = await Hotel.deleteOne({ id: id });
+
+  if (hotel) {
+    const newHotels = await Hotel.find();
+    res.json({
+      status: "Hotel has successfully been removed",
+      data: newHotels,
+    });
+  } else {
+    res.json({
+      status: "Something went wrong",
+    });
+  }
 };
 
 module.exports = {
