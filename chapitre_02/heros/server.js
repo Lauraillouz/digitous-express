@@ -54,33 +54,35 @@ const transformName = (req, _res, next) => {
   next();
 };
 // Middleware to check if hero already exists before add
-/* const checkHeroAdd = (req, res, next) => {
+const checkHeroAdd = async (req, res, next) => {
   const newHero = req.body;
-  superHeroes.map((hero) => {
-    if (hero.name.toLowerCase().replace(" ", "") === newHero.name) {
-      return res.json({
-        message: "Ce héros existe déjà !",
-      });
-    } else {
-      return next();
-    }
+  const superhero = await Superhero.findOne({
+    name: new RegExp(newHero.name, "i"),
   });
+  if (superhero) {
+    return res.json({
+      message: "Ce héros existe déjà !",
+    });
+  } else {
+    return next();
+  }
 };
 // Middleware to check if hero already exists before delete
-const checkHeroRemove = (req, res, next) => {
+const checkHeroRemove = async (req, res, next) => {
   const heroToRemove = req.params;
-  for (let i = 0; i < superHeroes.length; i++) {
-    if (
-      superHeroes[i].name.toLowerCase().replace(" ", "") === heroToRemove.name
-    ) {
-      return next();
-    } else {
-      return res.json({
-        message: "Ce héros n'existe pas !",
-      });
-    }
+
+  const superhero = await Superhero.findOne({
+    name: new RegExp(heroToRemove, "i"),
+  });
+
+  if (superhero) {
+    return next();
+  } else {
+    return res.json({
+      message: "Ce héros n'existe pas !",
+    });
   }
-}; */
+};
 
 // ROUTES
 //Global
@@ -102,15 +104,12 @@ app.get("/heroes", async (_req, res) => {
   });
 });
 // Add Hero
-app.post(
-  "/heroes",
-  /* transformName, checkHeroAdd, */ async (req, res) => {
-    await Superhero.create(req.body);
-    res.json({
-      message: "Ok, héros ajouté",
-    });
-  }
-);
+app.post("/heroes", transformName, checkHeroAdd, async (req, res) => {
+  await Superhero.create(req.body);
+  res.json({
+    message: "Ok, héros ajouté",
+  });
+});
 
 // Hero by name
 app.get("/heroes/:name", async (req, res) => {
@@ -124,38 +123,32 @@ app.get("/heroes/:name", async (req, res) => {
   });
 });
 // Delete Hero
-app.delete(
-  "/heroes/:name",
-  /* checkHeroRemove, */ async (req, res) => {
-    const paramsName = req.params.name;
-    const superheroName =
-      paramsName.charAt(0).toUpperCase() + paramsName.slice(1);
-    console.log(superheroName);
-    await Superhero.deleteOne({ name: superheroName });
-    res.json({
-      message: `${superheroName} effacé correctement`,
-    });
-  }
-);
+app.delete("/heroes/:name", checkHeroRemove, async (req, res) => {
+  const paramsName = req.params.name;
+  const superheroName =
+    paramsName.charAt(0).toUpperCase() + paramsName.slice(1);
+  console.log(superheroName);
+  await Superhero.deleteOne({ name: superheroName });
+  res.json({
+    message: `${superheroName} effacé correctement`,
+  });
+});
 // Replace Hero
-app.put(
-  "/heroes/:name",
-  /* validateHero, */ async (req, res) => {
-    const paramsName = req.params.name;
-    const superheroName =
-      paramsName.charAt(0).toUpperCase() + paramsName.slice(1);
-    const newHero = req.body;
-    const updatedHero = await Superhero.replaceOne(
-      { name: superheroName },
-      newHero
-    );
+app.put("/heroes/:name", async (req, res) => {
+  const paramsName = req.params.name;
+  const superheroName =
+    paramsName.charAt(0).toUpperCase() + paramsName.slice(1);
+  const newHero = req.body;
+  const updatedHero = await Superhero.replaceOne(
+    { name: superheroName },
+    newHero
+  );
 
-    res.json({
-      message: `${superheroName} a bien été remplacé`,
-      preuve: updatedHero,
-    });
-  }
-);
+  res.json({
+    message: `${superheroName} a bien été remplacé`,
+    preuve: updatedHero,
+  });
+});
 
 // Hero's power
 app.get("/heroes/:name/power", async (req, res) => {
