@@ -18,6 +18,10 @@ const App = () => {
     getUsers();
   }, []);
 
+  useEffect(() => {
+    console.log(img);
+  }, [img]);
+
   const handleChangeImg = (e) => {
     setImg(e.target.files[0]);
   };
@@ -35,7 +39,7 @@ const App = () => {
       body: formData,
     });
 
-    setUsers([...users, { name: username }]);
+    setUsers([...users, { name: username, image: img }]);
   };
 
   return (
@@ -47,6 +51,7 @@ const App = () => {
               return (
                 <div>
                   <p>{user.name}</p>
+                  <figure>{user.img}</figure>
                 </div>
               );
             })

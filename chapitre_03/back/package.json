@@ -1,7 +1,6 @@
 {
   "name": "chapitre_03",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,11 +11,15 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
+    "mongoose": "^6.0.5",
     "morgan": "^1.10.0",
     "multer": "^1.4.3",
     "nodemon": "^2.0.12",
     "path": "^0.12.7"
-  }
+  },
+  "devDependencies": {},
+  "description": ""
 }
