@@ -1,70 +1,45 @@
-const restaurants = [
-  {
-    id: 1,
-    name: "Les trois Mousquetaires",
-    address: "22 av des Champs-Élysées",
-    city: "Paris",
-    country: "France",
-    stars: 4,
-    cuisine: "french",
-    priceCategory: 3,
-  },
-  {
-    id: 2,
-    name: "The Fat Guy",
-    address: "47 Jackson Boulevard",
-    city: "New York",
-    country: "US",
-    stars: 5,
-    cuisine: "burger",
-    priceCategory: 1,
-  },
-  {
-    id: 3,
-    name: "Veggies",
-    address: "77 Avenir Street",
-    city: "Sydnet",
-    country: "Australia",
-    stars: 5,
-    cuisine: "vegan",
-    priceCategory: 2,
-  },
-];
+const Restaurant = require("../models/restaurantModel");
 
 //
 // GET //
-const getRestaurants = (req, res) => {
+const getRestaurants = async (req, res) => {
   const cuisine = req.query.cuisine;
   const city = req.query.city;
-  const limit = req.query.limit;
-  const stars = req.query.stars;
+  const limit = parseInt(req.query.limit);
+  const stars = parseInt(req.query.stars);
 
   // Get restaurants by cuisine & city
-  let filteredRestaurants = restaurants.filter((restaurant) => {
+  /*   let filteredRestaurants = restaurants.filter((restaurant) => {
     return (
       restaurant.cuisine === cuisine &&
       restaurant.city.replace(" ", "").toLowerCase() === city
     );
-  });
+  }); */
 
   // Get restaurants by stars and limited number
-  let limitedRestaurants = restaurants.filter((restaurant) => {
+  /* let limitedRestaurants = restaurants.filter((restaurant) => {
     return restaurant.stars === parseInt(stars);
   });
-  limitedRestaurants = limitedRestaurants.splice(0, limit);
+  limitedRestaurants = limitedRestaurants.splice(0, limit); */
 
   // Return
   if (cuisine && city) {
+    const filteredRestaurants = await Restaurant.find({
+      cuisine: new RegExp(cuisine, "i"),
+      city: new RegExp(city, "i"),
+    });
     return res.json({
       status: "Found matching data",
       data: filteredRestaurants,
     });
   } else if (limit) {
+    let limitedRestaurants = await Restaurant.find({ stars }).limit(limit);
     return res.json({
       status: "Limited results received",
       data: limitedRestaurants,
     });
   } else {
+    const restaurants = await Restaurant.find();
     res.json({
       status: "OK",
       data: restaurants,
@@ -72,64 +47,94 @@ const getRestaurants = (req, res) => {
   }
 };
 
-const getRestaurantById = (req, res) => {
-  const id = req.params.id;
-  const restaurant = restaurants.filter((restaurant) => {
-    return restaurant.id === parseInt(id);
-  });
-  res.json({
-    status: "OK",
-    data: restaurant,
-  });
+const getRestaurantById = async (req, res) => {
+  const id = parseInt(req.params.id);
+  const restaurant = await Restaurant.findOne({ id: id });
+  if (restaurant) {
+    res.json({
+      status: "OK",
+      data: restaurant,
+    });
+  } else {
+    res.json({
+      status: "Error",
+      message: "This ID does not exist",
+    });
+  }
 };
 
 //
 // POST //
-const newRestaurant = (req, res) => {
+const newRestaurant = async (req, res) => {
   const newRestaurant = req.body;
-  restaurants.push(newRestaurant);
 
-  res.json({
-    status: "Restaurant successfully added",
-    data: restaurants,
-  });
+  const restaurantAdded = await Restaurant.create(newRestaurant);
+
+  if (restaurantAdded) {
+    const restaurants = await Restaurant.find();
+    res.json({
+      status: "Restaurant successfully added",
+      data: restaurants,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "No restaurant found",
+    });
+  }
 };
 
 //
 // PUT //
-const changeRestaurantName = (req, res) => {
-  const id = req.params.id;
+const changeRestaurantName = async (req, res) => {
+  const id = parseInt(req.params.id);
   const queries = req.query;
 
   const queriesKeys = Object.keys(queries);
-  console.log("queries keys are", queriesKeys);
 
-  const restaurant = restaurants.find((restaurant) => {
-    return restaurant.id === parseInt(id);
-  });
+  const restaurant = await Restaurant.findOne({ id: id });
 
-  queriesKeys.map((value) => {
-    return (restaurant[value] = queries[value]);
-  });
-
-  res.json({
-    status: "Restaurant's name successfully updated",
-    data: restaurant,
-  });
+  if (restaurant) {
+    queriesKeys.map(async (value) => {
+      const updatedRestaurant = await Restaurant.updateOne(
+        { id: id },
+        { [value]: queries[value] }
+      );
+      return updatedRestaurant;
+    });
+    const restaurant = await Restaurant.findOne({ id: id });
+    res.json({
+      status: "Restaurant's name successfully updated",
+      data: restaurant,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "Something went wrong",
+    });
+  }
 };
 
 //
 // DELETE //
-const deleteRestaurant = (req, res) => {
-  const id = req.params.id;
-  const newRestaurants = restaurants.filter((restaurant) => {
-    return restaurant.id !== parseInt(id);
-  });
+const deleteRestaurant = async (req, res) => {
+  const id = parseInt(req.params.id);
 
-  res.json({
-    status: "Restaurant has been successfully removed",
-    data: newRestaurants,
-  });
+  const restaurant = await Restaurant.findOne({ id: id });
+
+  if (restaurant) {
+    await Restaurant.deleteOne({ id: id });
+    const newRestaurants = await Restaurant.find();
+    res.json({
+      status: "Restaurant has been successfully removed",
+      data: newRestaurants,
+    });
+  } else {
+    res.json({
+      status: "error",
+      message: "Something went wrong",
+    });
+  }
 };
 
 module.exports = {
