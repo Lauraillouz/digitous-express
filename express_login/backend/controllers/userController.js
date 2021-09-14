@@ -66,4 +66,21 @@ const createToken = async (req, res) => {
   });
 };
 
-module.exports = { newUser, createToken };
+const getUsers = async (_req, res) => {
+  const allUsersInfo = await User.find();
+
+  const users = allUsersInfo.map((user) => {
+    return {
+      firstName: user.firstName,
+      surname: user.surname,
+      dateOfBirth: user.dateOfBirth,
+    };
+  });
+
+  res.json({
+    status: "OK",
+    data: users,
+  });
+};
+
+module.exports = { newUser, createToken, getUsers };
