@@ -37,7 +37,8 @@ const Signup = () => {
     setConfirmPassword(e.target.value);
   };
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    e.preventDefault();
     const ispAsswordValid = passwordSchema.test(password);
     const isConfirmPasswordValid = password === confirmPassword;
     console.log("ispAsswordValid", ispAsswordValid);
