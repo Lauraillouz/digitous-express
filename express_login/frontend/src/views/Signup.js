@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
+// Components
+import Login from "./Login";
 // CSS
 import "../global.css";
 
@@ -11,6 +14,9 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [canLogin, setCanLogin] = useState(false);
+
+  const history = useHistory();
 
   const setupFirstName = (e) => {
     setFirstName(e.target.value);
@@ -48,11 +54,9 @@ const Signup = () => {
           email: email,
           password: password,
         }),
-      })
-        .then((res) => res.json())
-        .then((res) => {
-          console.log(res);
-        });
+      });
+      history.push("/login");
+      setCanLogin(true);
     } else {
       alert("Your form is invalid");
     }
@@ -60,37 +64,41 @@ const Signup = () => {
 
   return (
     <div>
-      <form className="flexForm width">
-        <label>First name</label>
-        <input type="text" onChange={setupFirstName} />
+      {!canLogin ? (
+        <form className="flexForm width">
+          <label>First name</label>
+          <input type="text" onChange={setupFirstName} />
 
-        <label>Surname</label>
-        <input type="text" onChange={setupSurname} />
+          <label>Surname</label>
+          <input type="text" onChange={setupSurname} />
 
-        <label>Date of birth</label>
-        <input type="date" onChange={setupDateBirth} />
+          <label>Date of birth</label>
+          <input type="date" onChange={setupDateBirth} />
 
-        <label>Email</label>
-        <input
-          type="email"
-          onChange={setupEmail}
-          placeholder="example@test.com"
-        />
+          <label>Email</label>
+          <input
+            type="email"
+            onChange={setupEmail}
+            placeholder="example@test.com"
+          />
 
-        <label>Password</label>
-        <input type="password" onChange={setupPassword} />
-        <p className="password-details">
-          Must contain 1 uppercase, 1 lowercase, 1 digit and be over 8
-          characters
-        </p>
+          <label>Password</label>
+          <input type="password" onChange={setupPassword} />
+          <p className="password-details">
+            Must contain 1 uppercase, 1 lowercase, 1 digit and be over 8
+            characters
+          </p>
 
-        <label>Confirm password</label>
-        <input type="password" onChange={setupConfirmPassword} />
+          <label>Confirm password</label>
+          <input type="password" onChange={setupConfirmPassword} />
 
-        <button type="submit" onClick={handleClick}>
-          Submit
-        </button>
-      </form>
+          <button type="submit" onClick={handleClick}>
+            Submit
+          </button>
+        </form>
+      ) : (
+        <Login />
+      )}
     </div>
   );
 };
