@@ -1,0 +1,16 @@
+.flexForm {
+  display: flex;
+  flex-direction: column;
+}
+.width {
+  width: 30rem;
+}
+label,
+button {
+  margin-top: 1.5rem;
+}
+
+button {
+  width: 100px;
+  align-self: center;
+}
