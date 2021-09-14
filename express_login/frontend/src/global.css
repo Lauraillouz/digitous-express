@@ -1,3 +1,6 @@
+* {
+  font-family: sans-serif;
+}
 .flexForm {
   display: flex;
   flex-direction: column;
@@ -13,4 +16,8 @@ button {
 button {
   width: 100px;
   align-self: center;
+}
+
+.password-details {
+  font-size: 0.6rem;
 }

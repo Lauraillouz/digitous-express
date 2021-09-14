@@ -25,6 +25,7 @@ const adminRouter = require("./routers/adminRouter");
 // Middlewares
 app.use(express.json());
 app.use(morgan("tiny"));
+app.use(cors());
 
 // ROUTES
 app.get("/", (_req, res) => {
